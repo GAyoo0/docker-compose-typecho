@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.5
+    volumes:
+      - /data/mysql:/data/mysql                                ##/data/mysql是我本地数据库存放目录
+      - /data/config/my.cnf:/etc/mysql/my.cnf                  ##映射my.cnf数据库配置文件
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "password"                        #定义mysql数据库密码
+    ports:
+      - "3306:3306"
+  
+  nginx-php-fpm:
+    image: richarvey/nginx-php-fpm:latest
+    restart: always
+    ports:
+      - "9000:9000"
+      - "80:80"
+    links:
+      - db
+    volumes:
+      - /data/www/build:/var/www/html                            #网站目录映射
+      - /data/config/typecho.conf:/etc/nginx/sites-enabled/default.conf      #vhost文件映射
+      - /data/www/logs:/etc/nginx/logs                         #日志目录映射
